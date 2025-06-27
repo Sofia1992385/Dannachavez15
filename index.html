@@ -8,204 +8,238 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Raleway:wght@300;400&display=swap" rel="stylesheet">
+    
     <style>
-        body {
-            font-family: 'Raleway', sans-serif;
-            background-color: #00041a;
-            color: #f0f0f0;
-            overflow-x: hidden;
+        :root { --gold-color: #E6C56C; }
+        body { 
+            font-family: 'Raleway', sans-serif; 
+            background-color: #00041a; 
+            color: #f0f0f0; 
+            overflow: hidden; 
         }
-        .font-playfair {
-            font-family: 'Playfair Display', serif;
+        body.loaded { 
+            overflow: auto; 
         }
-        .hero-section {
-            background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/e/ea/Van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg/1280px-Van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg');
-            background-size: cover;
-            background-position: center;
+        .font-playfair { font-family: 'Playfair Display', serif; }
+        .hero-section { 
+            background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/e/ea/Van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg/1280px-Van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg'); 
+            background-size: cover; 
+            background-position: center; 
+            background-attachment: fixed;
         }
-        .hero-overlay {
-            background-color: rgba(2, 4, 27, 0.6);
+        .hero-overlay { background-color: rgba(2, 4, 27, 0.6); }
+        .gold-text { color: var(--gold-color); }
+        .section { 
+            min-height: 100vh; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: center; 
+            align-items: center; 
+            text-align: center; 
+            padding: 4rem 2rem; 
+            position: relative; 
+            border-bottom: 1px solid rgba(230, 197, 108, 0.1); 
+            overflow: hidden;
         }
-        .gold-text {
-            color: #E6C56C; /* Un dorado más suave y elegante */
+        #splash-screen { 
+            position: fixed; inset: 0; z-index: 200; background-color: #00041a; 
+            display: flex; justify-content: center; align-items: center; text-align: center; 
+            transition: opacity 0.8s ease-out, visibility 0.8s; visibility: visible; opacity: 1; 
         }
-        .section {
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            padding: 2rem;
-            position: relative;
+        #splash-screen.fade-out { opacity: 0; visibility: hidden; }
+        .hidden { display: none; }
+        #music-control { 
+            position: fixed; bottom: 20px; right: 20px; z-index: 100; 
+            background-color: rgba(230, 197, 108, 0.8); border: none; border-radius: 50%; 
+            width: 50px; height: 50px; display: flex; justify-content: center; 
+            align-items: center; cursor: pointer; transition: transform 0.2s; 
         }
-        .scroll-down-indicator {
+        #music-control:hover { transform: scale(1.1); }
+        .countdown-box { 
+            background: rgba(255, 255, 255, 0.05); padding: 1.5rem; 
+            border-radius: 0.5rem; border: 1px solid rgba(230, 197, 108, 0.2); 
+            min-width: 100px; 
+        }
+        
+        .magic-stars-bg {
             position: absolute;
-            bottom: 2rem;
-            left: 50%;
-            transform: translateX(-50%);
-            animation: bounce 2s infinite;
+            top: 0; left: 0; right: 0; bottom: 0;
+            width: 100%; height: 100%;
+            background: radial-gradient(ellipse at bottom, #1b2735 0%, #090a0f 100%);
+            z-index: 0;
         }
-        @keyframes bounce {
-            0%, 20%, 50%, 80%, 100% {
-                transform: translateX(-50%) translateY(0);
-            }
-            40% {
-                transform: translateX(-50%) translateY(-20px);
-            }
-            60% {
-                transform: translateX(-50%) translateY(-10px);
-            }
+        #stars1, #stars2, #stars3 {
+            position: absolute; top: 0; left: 0;
+            width: 1px; height: 1px;
+            background: transparent;
+            animation: animStar 50s linear infinite;
         }
-        .fade-in-element {
+        #stars2 {
+            width: 2px; height: 2px;
+            animation-duration: 100s;
+        }
+        #stars3 {
+            width: 3px; height: 3px;
+            animation-duration: 150s;
+        }
+        @keyframes animStar {
+            from { transform: translateY(0px); }
+            to { transform: translateY(-2000px); }
+        }
+
+        .animate-words {
+            position: relative;
+            z-index: 10;
+        }
+        .animate-words span {
             opacity: 0;
-            transform: translateY(30px);
-            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+            transform: translateY(20px);
+            display: inline-block;
+            transition: opacity 0.5s ease, transform 0.5s ease;
         }
-        .fade-in-element.is-visible {
+        .animate-words.is-visible span {
             opacity: 1;
             transform: translateY(0);
-        }
-        #music-control {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            z-index: 100;
-            background-color: rgba(230, 197, 108, 0.8);
-            border: none;
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-            transition: transform 0.2s;
-        }
-        #music-control:hover {
-            transform: scale(1.1);
         }
     </style>
 </head>
 <body class="w-full">
 
-    <!-- Música de fondo -->
-    <audio id="background-music" loop>
-        <source src="https://www.chosic.com/wp-content/uploads/2022/01/And-So-It-Begins-Inspired-By-Crush-Sometimes.mp3" type="audio/mpeg">
-        Tu navegador no soporta el elemento de audio.
-    </audio>
-    <button id="music-control">
-        <svg id="play-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="#00041a" viewBox="0 0 16 16">
-          <path d="M10.804 8 5 4.633v6.734L10.804 8zm.792-.696a.802.802 0 0 1 0 1.392l-6.363 3.692C4.713 12.69 4 12.345 4 11.692V4.308c0-.653.713-.998 1.233-.696l6.363 3.692z"/>
-        </svg>
-        <svg id="pause-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="#00041a" class="hidden" viewBox="0 0 16 16">
-          <path d="M6 3.5a.5.5 0 0 1 .5.5v8a.5.5 0 0 1-1 0v-8a.5.5 0 0 1 .5-.5zm4 0a.5.5 0 0 1 .5.5v8a.5.5 0 0 1-1 0v-8a.5.5 0 0 1 .5-.5z"/>
-        </svg>
-    </button>
-
-    <!-- Sección 1: Bienvenida -->
-    <section class="section hero-section">
-        <div class="hero-overlay absolute inset-0"></div>
-        <div class="relative z-10 text-white fade-in-element">
+    <div id="splash-screen">
+        <div class="text-center">
             <h2 class="text-3xl font-playfair tracking-wider">Mis XV Años</h2>
             <h1 class="text-7xl md:text-8xl font-playfair my-4 gold-text">Danna Chávez</h1>
-            <p class="text-xl">Una noche bajo las estrellas</p>
+            <button id="enter-button" class="mt-8 bg-[var(--gold-color)] text-[#00041a] font-bold py-3 px-8 rounded-full text-lg hover:bg-yellow-300 transition-colors duration-300">Ver Invitación</button>
         </div>
-        <div class="scroll-down-indicator text-white">
-            <p class="mb-2 text-sm tracking-widest uppercase">Desliza para ver más</p>
-            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-chevron-down" viewBox="0 0 16 16">
-              <path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/>
-            </svg>
-        </div>
-    </section>
+    </div>
 
-    <!-- Sección 2: Invitación -->
-    <section class="section">
-        <div class="max-w-xl fade-in-element">
-            <p class="text-2xl md:text-3xl leading-relaxed">
-                Tengo el placer de invitarte a celebrar una noche mágica e inolvidable, donde los sueños brillan tan fuerte como las estrellas.
-            </p>
-        </div>
-    </section>
+    <div id="main-content" class="hidden">
+        <audio id="background-music" loop><source src="https://www.chosic.com/wp-content/uploads/2022/01/And-So-It-Begins-Inspired-By-Crush-Sometimes.mp3" type="audio/mpeg"></audio>
+        <button id="music-control">
+            <svg id="play-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="#00041a" class="hidden" viewBox="0 0 16 16"><path d="M10.804 8L5 4.633v6.734L10.804 8zm.792-.696a.802.802 0 0 1 0 1.392l-6.363 3.692C4.713 12.69 4 12.345 4 11.692V4.308c0-.653.713-.998 1.233-.696l6.363 3.692z"/></svg>
+            <svg id="pause-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="#00041a" viewBox="0 0 16 16"><path d="M6 3.5a.5.5 0 0 1 .5.5v8a.5.5 0 0 1-1 0v-8a.5.5 0 0 1 .5-.5zm4 0a.5.5 0 0 1 .5.5v8a.5.5 0 0 1-1 0v-8a.5.5 0 0 1 .5-.5z"/></svg>
+        </button>
+        
+        <section class="section hero-section">
+            <div class="hero-overlay absolute inset-0"></div>
+            <div class="relative z-10 text-white">
+                <h2 class="text-3xl font-playfair tracking-wider">Mis XV Años</h2>
+                <h1 class="text-7xl md:text-8xl font-playfair my-4 gold-text">Danna Chávez</h1>
+                <p class="text-xl">Una noche bajo las estrellas</p>
+            </div>
+        </section>
 
-    <!-- Sección 3: Detalles -->
-    <section class="section">
-        <div class="fade-in-element w-full max-w-2xl">
-            <h2 class="font-playfair text-5xl gold-text mb-12">El Momento y el Lugar</h2>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-12 text-lg">
-                <div>
-                    <h3 class="font-playfair text-3xl mb-2 gold-text">La Fecha</h3>
-                    <p>Sábado, 5 de Julio</p>
-                </div>
-                <div>
-                    <h3 class="font-playfair text-3xl mb-2 gold-text">La Hora</h3>
-                    <p>21:00 Hrs.</p>
-                </div>
-                <div>
-                    <h3 class="font-playfair text-3xl mb-2 gold-text">El Lugar</h3>
-                    <p>Quinta Vinicius, Ypané</p>
-                    <a href="https://www.google.com/maps/search/?api=1&query=Quinta+Vinicius+Ypane" target="_blank" rel="noopener noreferrer" class="text-base text-gray-300 underline hover:gold-text transition-colors duration-300">
-                        Ver en mapa
-                    </a>
+        <section class="section">
+            <div class="magic-stars-bg">
+                <div id="stars1"></div>
+                <div id="stars2"></div>
+                <div id="stars3"></div>
+            </div>
+            <div class="max-w-2xl relative z-10">
+                <p class="animate-words text-2xl md:text-3xl leading-loose">
+                    Tengo el placer de invitarte a celebrar una noche mágica e inolvidable.
+                </p>
+            </div>
+        </section>
+
+        <section id="countdown" class="section">
+            <div class="w-full max-w-3xl">
+                <h2 class="font-playfair text-5xl gold-text mb-12">La espera casi termina</h2>
+                <div id="countdown-container" class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8 text-center"></div>
+            </div>
+        </section>
+        
+        <section class="section">
+            <div class="w-full max-w-2xl">
+                <h2 class="font-playfair text-5xl gold-text mb-12">El Momento y el Lugar</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-12 text-lg">
+                    <div><h3 class="font-playfair text-3xl mb-2 gold-text">La Fecha</h3><p>Sábado, 5 de Julio</p></div>
+                    <div><h3 class="font-playfair text-3xl mb-2 gold-text">La Hora</h3><p>21:00 Hrs.</p></div>
+                    <div><h3 class="font-playfair text-3xl mb-2 gold-text">El Lugar</h3><p>Quinta Vinicius, Ypané</p><a href="https://maps.app.goo.gl/wS3N9e1fFDC9wz8b6" target="_blank" rel="noopener noreferrer" class="text-base text-gray-300 underline hover:gold-text transition-colors duration-300">Ver en mapa</a></div>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
 
-    <!-- Sección 4: Confirmación -->
-    <section class="section">
-        <div class="fade-in-element">
-            <h2 class="font-playfair text-5xl gold-text mb-8">Confirma tu Asistencia</h2>
-            <p class="mb-6">Tu presencia es mi mejor regalo, por favor confirma escaneando el código QR.</p>
-            <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=https://wa.me/595971235525?text=Hola,%20confirmo%20mi%20asistencia%20a%20los%20XV%20de%20Danna." 
-                 alt="Código QR para confirmar asistencia por WhatsApp" 
-                 class="mx-auto rounded-lg border-4 border-gray-600 p-2"
-                 onerror="this.onerror=null;this.src='https://placehold.co/180x180/ffffff/000000?text=QR';">
-            <p class="text-sm mt-4">o al (0971) 235-525</p>
-        </div>
-    </section>
+        <section id="vestimenta" class="section">
+            <div>
+                <h2 class="font-playfair text-5xl gold-text mb-8">Código de Vestimenta</h2>
+                <p class="text-3xl">Sport Elegante</p>
+                <p class="mt-4 max-w-lg text-gray-300">Queremos que te sientas cómodo y a la vez elegante.</p>
+            </div>
+        </section>
+        
+        <section class="section">
+            <div>
+                <h2 class="font-playfair text-5xl gold-text mb-8">Confirma tu Asistencia</h2>
+                <p class="mb-8 max-w-md">Tu presencia es muy importante para mí. Por favor, confirma tu asistencia.</p>
+                <a href="https://wa.me/595971235525?text=¡Hola%20Danna!%20Confirmo%20mi%20asistencia%20a%20tus%20XV" target="_blank" rel="noopener noreferrer" class="bg-[var(--gold-color)] text-[#00041a] font-bold py-3 px-8 rounded-full text-lg hover:bg-yellow-300 transition-colors duration-300">Confirmar por WhatsApp</a>
+                <p class="mt-6 text-sm">(0971) 235-525</p>
+            </div>
+        </section>
+
+        <footer class="text-center py-8 bg-black bg-opacity-20"></footer>
+    </div>
 
     <script>
-        // Script para animaciones al hacer scroll
-        const animatedElements = document.querySelectorAll('.fade-in-element');
-        const observer = new IntersectionObserver((entries) => {
+        const splashScreen = document.getElementById('splash-screen'), enterButton = document.getElementById('enter-button'), mainContent = document.getElementById('main-content'), body = document.body;
+        const music = document.getElementById('background-music'), musicControl = document.getElementById('music-control'), playIcon = document.getElementById('play-icon'), pauseIcon = document.getElementById('pause-icon');
+        enterButton.addEventListener('click', () => {
+            splashScreen.classList.add('fade-out'); mainContent.classList.remove('hidden'); body.classList.add('loaded');
+            const playPromise = music.play();
+            if (playPromise !== undefined) playPromise.then(() => { pauseIcon.classList.remove('hidden'); playIcon.classList.add('hidden'); }).catch(error => { console.error("Música bloqueada:", error); playIcon.classList.remove('hidden'); pauseIcon.classList.add('hidden'); });
+        });
+        musicControl.addEventListener('click', () => { if (music.paused) { music.play(); pauseIcon.classList.remove('hidden'); playIcon.classList.add('hidden'); } else { music.pause(); playIcon.classList.remove('hidden'); pauseIcon.classList.add('hidden'); } });
+        
+        const eventDate = new Date("Jul 5, 2025 21:00:00").getTime(), countdownContainer = document.getElementById('countdown-container');
+        const countdownFunction = setInterval(function() {
+            const now = new Date().getTime(), distance = eventDate - now;
+            if (distance < 0) { clearInterval(countdownFunction); countdownContainer.innerHTML = "<h2 class='col-span-full font-playfair text-5xl gold-text'>¡El gran día ha llegado!</h2>"; return; }
+            const days = String(Math.floor(distance / (1000 * 60 * 60 * 24))).padStart(2, '0'), hours = String(Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))).padStart(2, '0');
+            const minutes = String(Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60))).padStart(2, '0'), seconds = String(Math.floor((distance % (1000 * 60)) / 1000)).padStart(2, '0');
+            countdownContainer.innerHTML = `<div class="countdown-box"><p class="font-playfair text-5xl gold-text">${days}</p><p class="text-sm uppercase tracking-widest">Días</p></div><div class="countdown-box"><p class="font-playfair text-5xl gold-text">${hours}</p><p class="text-sm uppercase tracking-widest">Horas</p></div><div class="countdown-box"><p class="font-playfair text-5xl gold-text">${minutes}</p><p class="text-sm uppercase tracking-widest">Minutos</p></div><div class="countdown-box"><p class="font-playfair text-5xl gold-text">${seconds}</p><p class="text-sm uppercase tracking-widest">Segundos</p></div>`;
+        }, 1000);
+
+        const animatedTextElements = document.querySelectorAll('.animate-words');
+        const textObserver = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
-                    entry.target.classList.add('is-visible');
+                    const el = entry.target;
+                    if (!el.classList.contains('is-visible')) {
+                        const words = el.textContent.trim().split(/\s+/);
+                        el.innerHTML = '';
+                        words.forEach((word, i) => {
+                            const span = document.createElement('span');
+                            span.textContent = word;
+                            span.style.transitionDelay = `${i * 150}ms`;
+                            el.appendChild(span);
+                            if (i < words.length - 1) {
+                                el.append(' ');
+                            }
+                        });
+                        el.classList.add('is-visible');
+                    }
                 }
             });
-        }, { threshold: 0.1 });
-        animatedElements.forEach(element => observer.observe(element));
-        
-        // --- CÓDIGO DE MÚSICA CORREGIDO Y MÁS ROBUSTO ---
-        const music = document.getElementById('background-music');
-        const musicControl = document.getElementById('music-control');
-        const playIcon = document.getElementById('play-icon');
-        const pauseIcon = document.getElementById('pause-icon');
+        }, { threshold: 0.5 });
+        animatedTextElements.forEach(element => textObserver.observe(element));
 
-        musicControl.addEventListener('click', () => {
-            // Verificamos el estado actual de la música para decidir la acción
-            if (music.paused) {
-                // Si está pausada, intentamos reproducirla
-                const playPromise = music.play();
-                if (playPromise !== undefined) {
-                    playPromise.then(_ => {
-                        // La reproducción comenzó con éxito, actualizamos los iconos
-                        playIcon.classList.add('hidden');
-                        pauseIcon.classList.remove('hidden');
-                    }).catch(error => {
-                        // La reproducción fue bloqueada por el navegador o hubo un error
-                        console.error("Error al intentar reproducir:", error);
-                        // No cambiamos el icono para que el usuario pueda volver a intentarlo.
-                    });
+        function createStars() {
+            const starLayers = ['stars1', 'stars2', 'stars3'];
+            const shadowCounts = [700, 200, 100];
+            starLayers.forEach((layerId, index) => {
+                const starLayer = document.getElementById(layerId);
+                if(starLayer) {
+                    let boxShadow = '';
+                    const count = shadowCounts[index];
+                    for (let i = 0; i < count; i++) {
+                        boxShadow += `${Math.floor(Math.random() * 2000)}px ${Math.floor(Math.random() * 2000)}px #FFF`;
+                        if (i < count - 1) { boxShadow += ', '; }
+                    }
+                    starLayer.style.boxShadow = boxShadow;
                 }
-            } else {
-                // Si ya está sonando, la pausamos y actualizamos los iconos
-                music.pause();
-                playIcon.classList.remove('hidden');
-                pauseIcon.classList.add('hidden');
-            }
-        });
+            });
+        }
+        createStars();
     </script>
 </body>
 </html>
